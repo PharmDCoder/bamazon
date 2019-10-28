@@ -1,0 +1,26 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Online Storefront and Inventory Management System",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PharmDCoder/bamazon.git"
+  },
+  "keywords": [
+    "bamazon"
+  ],
+  "author": "Jamie O'Neill",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PharmDCoder/bamazon/issues"
+  },
+  "homepage": "https://github.com/PharmDCoder/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^7.0.0",
+    "mysql": "^2.17.1"
+  }
+}

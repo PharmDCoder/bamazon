@@ -47,7 +47,7 @@ Bamazon has three different user interfaces: customer, manager, and supervisor.
       **Create New Department**
         1. type the name of the department to add and press enter
         2. type the overhead cost of the department and press enter 
-        
+
     ![bamazon supervisor demo](gifs/bamazonSupervisor.gif)
 
 
@@ -60,4 +60,4 @@ Bamazon has three different user interfaces: customer, manager, and supervisor.
   6. .gitignore - this file allows developer to choose which files not to upload to the repository (mySQL password as well as the cumbersome node_modules file)
 
 
-# Created by: Jamie O'Neill
+### Created by: Jamie O'Neill

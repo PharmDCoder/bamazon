@@ -1,18 +1,19 @@
-// Assigning required 
+//require all of mysql, inquirer, dotenv, and the local keys file
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require("cli-table");
+require("dotenv").config();
+var keys = require("./keys.js");
+//sets mySql connection
 var connection = mysql.createConnection({
     host: "localhost",
-    // Your port; if not 3306
     port: 3306,
-    // Your username
     user: "root",
-    // Your password
-    password: "Jleigh08",
+    // Links to env password password
+    password: keys.mySql.password,
     database: "bamazon_db"
 });
-
+// Create a constructor table using the cli-table npm
 var table = new Table({
     head: ['ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity'],
     chars: {
@@ -22,15 +23,16 @@ var table = new Table({
         , 'right': '║', 'right-mid': '╢', 'middle': '│'
     }
 });
-
+//connecting to mysql database
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
+    //pulling data from the products table
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
-        // Log all results of the SELECT statement
+        //assigning results to variable queryRes
         queryRes = res;
     });
+    //initiate inquirer npm to ask user to select choice
     inquirer.prompt([
         {
             type: "list",
@@ -40,10 +42,10 @@ connection.connect(function (err) {
         }
     ]).then(function (command) {
         var userCommand = command.userCommand;
+        //Creating switch function to run code depending on the user's previous selection
         switch (userCommand) {
             case "View Products for Sale":
-                console.log("user picked 'View Products for Sale'");
-                // instantiate
+                //create a for loop to loop through results and push selected data to the Table constructor
                 for (let index = 0; index < queryRes.length; index++) {
                     table.push([queryRes[index].id, queryRes[index].product_name, queryRes[index].department_name,
                     queryRes[index].price, queryRes[index].stock_quantity]);
@@ -52,10 +54,9 @@ connection.connect(function (err) {
                 connection.end();
                 break;
             case "View Low Inventory":
-                //I want to go back and add a minimum column and if current inventory is below pull that
-                console.log("user picked 'View Low Inventory'");
+                //Create a for loop to loop through entire products table and push results to the Table constructor if stock quantity is less than 20
                 for (let index = 0; index < queryRes.length; index++) {
-                    if (queryRes[index].stock_quantity < 30) {
+                    if (queryRes[index].stock_quantity < 20) {
                         table.push([queryRes[index].id, queryRes[index].product_name, queryRes[index].department_name,
                         queryRes[index].price, queryRes[index].stock_quantity]);
                     }
@@ -64,13 +65,13 @@ connection.connect(function (err) {
                 connection.end();
                 break;
             case "Add to Inventory":
-                console.log("user picked 'Add to Inventory'");
+                //create an empty results array to push all products data to for the user to select option from in inquirer prompt
                 var resultsArr = [];
                 for (let index = 0; index < queryRes.length; index++) {
                     resultsArr.push("ID: " + queryRes[index].id + " Item: " + queryRes[index].product_name + " Department Name: " + queryRes[index].department_name
                         + " Price: " + queryRes[index].price + " Stock Qty: " + queryRes[index].stock_quantity);
                 }
-
+                //use inquirer npm to ask user to select from products table the item they would like to add inventory to
                 inquirer.prompt([
                     {
                         type: "list",
@@ -80,11 +81,12 @@ connection.connect(function (err) {
                     }
                 ]).then(function (command) {
                     var userCommand = command.userCommand;
+                    //sets the item selected by isolating the item number which starts at index 4 and ends right before the space before "item"
                     var product_ID = userCommand.substring(
                         userCommand.indexOf("ID: ") + 4,
                         userCommand.indexOf(" Item")
                     );
-
+                    //use inquirer npm to prompt user to insert a quantity of inventory to add
                     inquirer.prompt([
                         {
                             type: "input",
@@ -93,16 +95,18 @@ connection.connect(function (err) {
                         },
 
                     ]).then(function (item) {
+                        //set variable stockQty equal to correct index from queryRes b/c it is an array starting at position 0 and ID starts at position 1
                         var stockQty = queryRes[product_ID - 1].stock_quantity;
+                        //set variable newQty equal to stock qty + user input qty
                         var newQty = parseInt(stockQty) + parseInt(item.add_qty);
-                        console.log(product_ID);
+                        //connect to Bamazon database to update the stock quantity
                         connection.query("UPDATE products SET stock_quantity = ? WHERE id = ?", [newQty, product_ID], function (err, res) {
-                            
                             if (err) throw err;
-
+                            //connect to Bamazon database to pull new data
                             connection.query("SELECT * FROM products", function (err, res) {
                                 if (err) throw err;
                                 updateInv = res;
+                                //push results of new data pull to Table constructor
                                 table.push([updateInv[product_ID - 1].id, updateInv[product_ID - 1].product_name, updateInv[product_ID - 1].department_name,
                                 updateInv[product_ID - 1].price, updateInv[product_ID - 1].stock_quantity]);
                                 console.log(table.toString());
@@ -113,7 +117,7 @@ connection.connect(function (err) {
                 })
                 break;
             case "Add New Product":
-                console.log("user picked 'Add New Product'");
+                //use inquirer npm to get user's input for new product
                 inquirer.prompt([
                     {
                         type: "input",
@@ -136,16 +140,33 @@ connection.connect(function (err) {
                         message: "Enter stock quantity"
                     }
                 ]).then(function (newItem) {
-                    createItem(newItem.name, newItem.department, newItem.price, newItem.quantity);
+                    //set department found equal to false so that if department is not found it will throw error
+                    var department_found = false;
+                    //use for loop to loop through query results to see if the department of the new item exists
+                    for (let index = 0; index < queryRes.length; index++) {
+                        if (newItem.department === queryRes[index].department_name) {
+                            //if department exists run the createItem function to add to products database and update table results
+                            createItem(newItem.name, newItem.department, newItem.price, newItem.quantity);
+                            //set department found to true so that you don't throw an error below
+                            department_found = true;
+                            break;
+                        }
+                    }
+                    //if the department does not exist prompt user to contact Supervisor to add the department
+                    if (!department_found) {
+                        console.log(newItem.department + " department does not exist in the database.  Please contact the Bamazon Supervisor.")
+                        connection.end();
+                    }
                 })
                 break;
         }
 
     })
 });
-
+//function to add new item to products table and push results into Table constructor
 function createItem(productName, departmentName, price, stockQuantity) {
     console.log("Inserting a new item...\n");
+    //connecting to bamazon to add new product info from previous inquirer response into products table
     var query = connection.query("INSERT INTO products SET ?",
         {
             product_name: productName,
@@ -155,8 +176,16 @@ function createItem(productName, departmentName, price, stockQuantity) {
         },
         function (err, res) {
             if (err) throw err;
-            console.log(productName + " inserted!\n");
-            connection.end();
-        }
-    );
+            //connecting to bamazon to pull new row of data from products since the newest product will have the highest id
+            connection.query("SELECT * FROM products WHERE id=(SELECT max(id) FROM products)", function (err, res) {
+                if (err) throw err;
+                updateInv = res;
+                //push results from the data pull into the Table constructor
+                table.push([updateInv[0].id, updateInv[0].product_name, updateInv[0].department_name,
+                updateInv[0].price, updateInv[0].stock_quantity]);
+                console.log(table.toString());
+                connection.end();
+            });
+
+        });
 }

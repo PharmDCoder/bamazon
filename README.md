@@ -16,7 +16,7 @@ Bamazon has three different user interfaces: customer, manager, and supervisor.
     - use the up and down arrow keys to scroll through the list of available items to purchase and press enter
     - type the desired quantity to purchase and press enter
     (if the desired quantity exceeds the stock quantity, you will recieve an error) 
-    ![bamazon customer demo](gifs/bamazonCustomer.gif)
+    ![bamazon customer demo](./gifs/bamazonCustomer.gif)
   
   ### 2.  Manager Interface:
     - open command line prompt
@@ -36,7 +36,7 @@ Bamazon has three different user interfaces: customer, manager, and supervisor.
         4. type the stock quantity of the new item and press enter
         (if the department for the new item does not yet exist, you will receive an error to contact the Bamazon Supervisor)
 
-    ![bamazon manager demo](gifs/bamazonManager.gif)
+    ![bamazon manager demo](./gifs/bamazonManager.gif)
 
   ### 3.  Supervisor Interface:
     - open command line prompt
@@ -48,7 +48,7 @@ Bamazon has three different user interfaces: customer, manager, and supervisor.
         1. type the name of the department to add and press enter
         2. type the overhead cost of the department and press enter 
 
-    ![bamazon supervisor demo](gifs/bamazonSupervisor.gif)
+    ![bamazon supervisor demo](./gifs/bamazonSupervisor.gif)
 
 
 # Technologies Deployed: 

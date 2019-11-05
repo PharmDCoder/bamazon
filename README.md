@@ -17,6 +17,7 @@ Bamazon has three different user interfaces: customer, manager, and supervisor.
     - type the desired quantity to purchase and press enter
     (if the desired quantity exceeds the stock quantity, you will recieve an error) 
     ![bamazon customer demo](./gifs/bamazonCustomer.gif)
+    <img src="gifs/bamazonCustomer.gif" height="400px">
   
   ### 2.  Manager Interface:
     - open command line prompt
